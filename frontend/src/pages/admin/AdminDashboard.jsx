@@ -9,10 +9,9 @@ import { useCollection } from '../../hooks/useFirestore';
 const AdminDashboard = () => {
   const { data: farmers, loading: loadingFarmers } = useCollection('farmers');
   const { data: fpos, loading: loadingFpos } = useCollection('fpos', [{ field: 'status', op: '==', value: 'Active' }]);
-  const { data: buyers, loading: loadingBuyers } = useCollection('buyers');
+  const { data: buyers, loading: loadingBuyers } = useCollection('users', [{ field: 'role', op: '==', value: 'BUYER' }]);
   const { data: expertCases, loading: loadingCases } = useCollection('expertCases', [{ field: 'status', op: '==', value: 'Open' }]);
-  const { data: transactions, loading: loadingTx } = useCollection('transactions', [{ field: 'status', op: 'in', value: ['Active', 'Pending'] }]);
-  const { data: recentActivity, loading: loadingActivity } = useCollection('auditLogs', [], { field: 'createdAt', direction: 'desc' });
+  const { data: transactions, loading: loadingTx } = useCollection('transactions');
 
   const columns = [
     { header: 'Type', accessor: 'type' },
@@ -24,7 +23,7 @@ const AdminDashboard = () => {
     { header: 'Status', render: (row) => <StatusBadge status={row.status} /> },
   ];
 
-  if (loadingFarmers || loadingFpos || loadingBuyers || loadingCases || loadingTx || loadingActivity) {
+  if (loadingFarmers || loadingFpos || loadingBuyers || loadingCases || loadingTx) {
     return <div className="card text-center p-8">Loading dashboard data...</div>;
   }
 
@@ -68,14 +67,6 @@ const AdminDashboard = () => {
         />
       </div>
 
-      <div className="flex-col gap-4">
-        <h2 className="text-lg font-bold">Recent Platform Activity</h2>
-        <DataTable 
-          columns={columns} 
-          data={recentActivity.slice(0, 10)} 
-          emptyMessage="No data available yet."
-        />
-      </div>
     </div>
   );
 };
