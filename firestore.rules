@@ -1,0 +1,84 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    function hasRole(role) {
+      return isAuthenticated() && getUserData().role == role;
+    }
+
+    // Admins can do anything
+    match /{document=**} {
+      allow read, write: if hasRole('ADMIN');
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || hasRole('ADMIN'));
+      allow write: if hasRole('ADMIN');
+    }
+
+    // Expert Cases
+    match /expertCases/{caseId} {
+      allow read: if hasRole('EXPERT') || hasRole('ADMIN');
+      allow write: if hasRole('EXPERT') || hasRole('ADMIN');
+    }
+    
+    match /expertValidations/{validationId} {
+      allow read, write: if hasRole('EXPERT') || hasRole('ADMIN');
+    }
+
+    // Harvest Listings
+    match /harvestListings/{listingId} {
+      // Buyers can see active harvest listings for matching
+      allow read: if hasRole('FPO') || hasRole('BUYER') || hasRole('ADMIN');
+      allow write: if hasRole('FPO') || hasRole('ADMIN');
+    }
+
+    // Buyer Requirements
+    match /buyerRequirements/{reqId} {
+      // FPOs can see active requirements for matching
+      allow read: if hasRole('BUYER') || hasRole('FPO') || hasRole('ADMIN');
+      allow write: if hasRole('BUYER') || hasRole('ADMIN');
+    }
+
+    // Offers
+    match /offers/{offerId} {
+      allow read: if hasRole('BUYER') || hasRole('FPO') || hasRole('ADMIN');
+      // Buyers create offers, FPOs update them
+      allow create: if hasRole('BUYER') || hasRole('ADMIN');
+      allow update: if hasRole('FPO') || hasRole('BUYER') || hasRole('ADMIN');
+    }
+
+    // Transactions
+    match /transactions/{transactionId} {
+      allow read: if hasRole('BUYER') || hasRole('FPO') || hasRole('ADMIN');
+      allow create: if hasRole('FPO') || hasRole('ADMIN');
+      allow update: if hasRole('FPO') || hasRole('ADMIN');
+    }
+
+    // Audit logs, schemes, marketPrices, notifications etc.
+    match /auditLogs/{logId} {
+      allow read: if hasRole('ADMIN');
+      allow write: if isAuthenticated(); // Could be triggered by anyone
+    }
+    
+    match /farmers/{farmerId} {
+      allow read: if isAuthenticated();
+      allow write: if hasRole('ADMIN') || hasRole('FPO');
+    }
+    
+    match /fpos/{fpoId} {
+      allow read: if isAuthenticated();
+      allow write: if hasRole('ADMIN');
+    }
+  }
+}

@@ -1,0 +1,75 @@
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: var(--bg-app);
+  padding: var(--spacing-4);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: var(--spacing-8);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: var(--spacing-6);
+}
+
+.login-header .logo {
+  margin-bottom: var(--spacing-2);
+}
+
+.login-error {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-bottom: var(--spacing-4);
+  padding: var(--spacing-2);
+  border-radius: var(--radius-md);
+}
+
+.w-full {
+  width: 100%;
+}
+
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: var(--spacing-3);
+  color: var(--text-tertiary);
+}
+
+.input-with-icon .form-input {
+  padding-left: 2.5rem;
+}
+
+.demo-accounts {
+  margin-top: var(--spacing-6);
+  padding-top: var(--spacing-4);
+  border-top: 1px solid var(--border-light);
+  text-align: center;
+}
+
+.demo-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+  justify-content: center;
+  margin-top: var(--spacing-2);
+}
+
+.demo-buttons button {
+  cursor: pointer;
+}
+
+.demo-buttons button:hover {
+  background-color: var(--color-gray-200);
+}
